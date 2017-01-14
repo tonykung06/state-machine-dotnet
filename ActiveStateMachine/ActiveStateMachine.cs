@@ -8,7 +8,7 @@ using Common;
 
 namespace ActiveStateMachine
 {
-
+    
     /// <summary>
     /// Base class for active state machines
     /// </summary>
@@ -27,7 +27,7 @@ namespace ActiveStateMachine
         private readonly State _initialState;
         private ManualResetEvent _resumer;
         private CancellationTokenSource _tokenSource;
-
+        
         //Methods
 
         /// <summary>
@@ -40,7 +40,7 @@ namespace ActiveStateMachine
             // Configure state machine
             StateList = stateList;
             // Anything needs to start somewhere - the initial state
-            _initialState = new State("InitialState", null, null, null);
+            _initialState = new State("InitialState", null,null,null);
             // Collection taking all triggers. It is thread-safe and blocking as well as FIFO!
             // Limiting its capacity protects against DOS like errors or attacks
             TriggerQueue = new BlockingCollection<string>(queueCapacity);
@@ -63,7 +63,7 @@ namespace ActiveStateMachine
             _tokenSource = new CancellationTokenSource();
 
             // Create a new worker thread, if it does not exist
-            _queueWorkerTask = Task.Factory.StartNew(QueueWorkerMethod, _tokenSource, TaskCreationOptions.LongRunning);
+            _queueWorkerTask = Task.Factory.StartNew(QueueWorkerMethod,_tokenSource, TaskCreationOptions.LongRunning);
 
             // Set engine state
             StateMachineEngine = EngineState.Running;
@@ -129,7 +129,7 @@ namespace ActiveStateMachine
             }
 
             // This is the synchronization object for resuming - passing true means non-blocking (signaled), which is the normal operation mode.
-            _resumer = new ManualResetEvent(true);
+            _resumer= new ManualResetEvent(true);
         }
 
 
@@ -152,17 +152,17 @@ namespace ActiveStateMachine
             RaiseStateMachineSystemEvent("ActiveStateMachine - Trigger entered", newTrigger);
         }
 
-
+        
         /// <summary>
         /// Worker method for trigger queue
         /// </summary>
         private void QueueWorkerMethod(object dummy)
         {
-            // Blocks execution until it is reset. Used to pause the state machine.
-            _resumer.WaitOne();
+                // Blocks execution until it is reset. Used to pause the state machine.
+                _resumer.WaitOne();
 
-            // Block the queue and loop through all triggers available. Blocking queue guarantees FIFO and the GetConsumingEnumerable method
-            // automatically removes triggers from queue!
+                // Block the queue and loop through all triggers available. Blocking queue guarantees FIFO and the GetConsumingEnumerable method
+                // automatically removes triggers from queue!
             try
             {
                 foreach (var trigger in TriggerQueue.GetConsumingEnumerable())
@@ -180,12 +180,10 @@ namespace ActiveStateMachine
                     {
                         ExecuteTransition(transition.Value);
                     }
-
-                    // Do not place any code here, because it will not be executed!
-                    // The foreach loop keeps spinning on the queue until thread is canceled.
-
-
+                    
                 }
+                // Do not place any code here, because it will not be executed!
+                // The foreach loop keeps spinning on the queue until thread is canceled.
             }
             catch (Exception ex)
             {
@@ -219,13 +217,21 @@ namespace ActiveStateMachine
                 return;
             }
 
+
+            //Self transition - Just do the transition without executing exit, entry actions or guards
+            if (transition.SourceStateName == transition.TargetStateName)
+            {
+                transition.TransitionActionList.ForEach(t => t.Execute());
+                return; //Important: Return directly from self-transition
+            }
+
             // Run all exit actions of the old state
-            CurrentState.ExitActions.ForEach(a => a.Execute());
+            CurrentState.ExitActions.ForEach( a => a.Execute());
 
             // Run all guards of the transition
             transition.GuardList.ForEach(g => g.Execute());
             string info = transition.GuardList.Count + " guard actions executed!";
-            RaiseStateMachineSystemEvent("State machine: ExecuteTransition", info);
+            RaiseStateMachineSystemEvent("State machine: ExecuteTransition", info); 
 
             // Run all actions of the transition
             transition.TransitionActionList.ForEach(t => t.Execute());
@@ -235,23 +241,23 @@ namespace ActiveStateMachine
             // State change
             //////////////////
             info = transition.TransitionActionList.Count + " transition actions executed!";
-            RaiseStateMachineSystemEvent("State machine: Begin state change!", info);
+            RaiseStateMachineSystemEvent("State machine: Begin state change!", info); 
 
-
+                
             // First resolve the target state with the help of its name
             var targetState = GetStatefromStateList(transition.TargetStateName);
-
+               
             // Transition successful - Change state
             PreviousState = CurrentState;
             CurrentState = targetState;
-
+                
             // Run all entry actions of new state
             foreach (var entryAction in CurrentState.EntryActions)
             {
                 entryAction.Execute();
             }
 
-            RaiseStateMachineSystemEvent("State machine: State change completed successfully!", "Previous state: "
+            RaiseStateMachineSystemEvent("State machine: State change completed successfully!", "Previous state: " 
                 + PreviousState.StateName + " - New state = " + CurrentState.StateName);
         }
 
@@ -276,9 +282,9 @@ namespace ActiveStateMachine
         private void RaiseStateMachineSystemEvent(String eventName, String eventInfo)
         {
             // Raise event only, if subscribers exist. Otherwise an exception occurs
-            if (StateMachineEvent != null) StateMachineEvent(this, new StateMachineEventArgs(eventName, eventInfo, StateMachineEventType.System, "State machine"));
+            if (StateMachineEvent != null) StateMachineEvent(this,new StateMachineEventArgs(eventName,eventInfo, StateMachineEventType.System, "State machine"));
         }
-
+        
         /// <summary>
         /// Raises an event of type command
         /// </summary>
@@ -298,13 +304,24 @@ namespace ActiveStateMachine
         /// <param name="intArgs"></param>
         public void InternalNotificationHandler(object sender, StateMachineEventArgs intArgs)
         {
-            EnterTrigger(intArgs.EventName);
+            // Catastrophic error
+            if (intArgs.EventName == "CompleteFailure")
+            {
+                RaiseStateMachineSystemCommand("CompleteFailure", intArgs.EventInfo + " Device : " + intArgs.Source);
+                // Stop state machine to avoid any damage
+                Stop();
+            }
+                // Normal operation
+            else
+            {
+                EnterTrigger(intArgs.EventName);
+            }
         }
         #endregion
     }
 
-    // Engines states for state machine   
-    public enum EngineState
+// Engines states for state machine   
+public enum EngineState
     {
         Running,
         Stopped,
@@ -318,7 +335,8 @@ namespace ActiveStateMachine
 // Disclaimer - Building State Machines in .NET
 // =======================================================================
 // 
-//   THIS CODE IS EDUCATIONAL AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF
+//   THIS CODE IS EDUCATIONAL AND INFORMATION IS PROVIDED "AS IS" WITHOUT 
+//   WARRANTY OF
 //   ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO
 //   THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
 //   PARTICULAR PURPOSE.

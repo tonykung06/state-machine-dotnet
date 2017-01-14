@@ -9,6 +9,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApplicationServices", "Appl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csproj", "{3EE7462C-8EBE-422D-92B3-E31EFE336FDC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TelephoneStateMachine", "TelephoneStateMachine\TelephoneStateMachine.csproj", "{024A6C12-03FF-424E-8655-D4A54D377590}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Telephone_UI", "Telephone_UI\Telephone_UI.csproj", "{F06EA532-5698-4ACE-AF6C-6536B0B0EAF5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +31,14 @@ Global
 		{3EE7462C-8EBE-422D-92B3-E31EFE336FDC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3EE7462C-8EBE-422D-92B3-E31EFE336FDC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3EE7462C-8EBE-422D-92B3-E31EFE336FDC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{024A6C12-03FF-424E-8655-D4A54D377590}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{024A6C12-03FF-424E-8655-D4A54D377590}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{024A6C12-03FF-424E-8655-D4A54D377590}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{024A6C12-03FF-424E-8655-D4A54D377590}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F06EA532-5698-4ACE-AF6C-6536B0B0EAF5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F06EA532-5698-4ACE-AF6C-6536B0B0EAF5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F06EA532-5698-4ACE-AF6C-6536B0B0EAF5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F06EA532-5698-4ACE-AF6C-6536B0B0EAF5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

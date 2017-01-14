@@ -1,12 +1,21 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using ApplicationServices;
 
-namespace Common
+namespace TelephoneStateMachine 
 {
-    public interface IViewStateConfiguration
+    /// <summary>
+    /// This class is not needed in the incoming call use case
+    /// </summary>
+    public class DeviceDial : Device
     {
-        Dictionary<string, object> ViewStates { get;}
-        string[] ViewStateList { get; }
-        string DefaultViewState { get; }
+        public DeviceDial(string name, Action<string, string, string> eventCallBack) : base(name, eventCallBack)
+        {
+        }
+        public override void OnInit()
+        {
+        }
+
+        // No functionality to implement here!- Yet.
     }
 }
 
@@ -14,13 +23,12 @@ namespace Common
 // Disclaimer - Building State Machines in .NET
 // =======================================================================
 // 
-//   THIS CODE IS EDUCATIONAL AND INFORMATION IS PROVIDED "AS IS" WITHOUT 
-//   WARRANTY OF
+//   THIS CODE IS EDUCATIONAL AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF
 //   ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO
 //   THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
 //   PARTICULAR PURPOSE.
 // 
-//    Copyright (C) 2014 Wechsler Consulting GmbH & Co. KG
+//    Copyright (C) 2013 Wechsler Consulting GmbH & Co. KG
 // 
 //    Alexander Wechsler, Enterprise Architect
 //    Microsoft Regional Director Germany | eMVP

@@ -1,15 +1,17 @@
-﻿using System.Collections.Generic;
-
-namespace Common
+﻿namespace Common
 {
-    public interface IViewStateConfiguration
+    /// <summary>
+    /// Interface defining view states
+    /// </summary>
+    public interface IViewState
     {
-        Dictionary<string, object> ViewStates { get;}
-        string[] ViewStateList { get; }
-        string DefaultViewState { get; }
+        // View state name
+        string Name { get; }
+        // Isdefault property
+        bool IsDefaultViewState { get;}
     }
-}
 
+}
 // =======================================================================
 // Disclaimer - Building State Machines in .NET
 // =======================================================================
